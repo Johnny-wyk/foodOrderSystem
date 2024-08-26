@@ -12,7 +12,6 @@ import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
-import com.sky.exception.BaseException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
@@ -69,21 +68,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void save(EmployeeDTO employeeDTO) {
-        Employee employee=new Employee();
-        //对象属性拷贝
+        Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
 
-        //设置账号状态
-        employee.setStatus(StatusConstant.ENABLE);
-        //设置密码
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-
-        //设置时间
+        employee.setStatus(StatusConstant.ENABLE);
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
 
-        //设置当前记录记录人的id
-        // TODO 后期修改登录用户的id
+        //设置当前创建人的id
         employee.setCreateUser(BaseContext.getCurrentId());
         employee.setUpdateUser(BaseContext.getCurrentId());
 
@@ -91,24 +84,31 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+    public PageResult page(EmployeePageQueryDTO employeePageQueryDTO) {
         //开始分页查询
+        //select * from employee limit 0,10
         PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
 
         Page<Employee> page=employeeMapper.pageQuery(employeePageQueryDTO);
         long total = page.getTotal();
-        List<Employee> RECORDS = page.getResult();
-        return new PageResult(total,RECORDS);
+        List<Employee> result = page.getResult();
+        return new PageResult(total,result);
     }
 
-    /**
-     * 启用禁用员工账号
-     * @param status
-     * @param id
-     */
     @Override
-    public void StartorStop(Integer status, Long id) {
-        Employee employee = Employee.builder().status(status).id(id).build();
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = new Employee();
+        employee.setStatus(status);
+        employee.setId(id);
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.update(employee);
     }
 
@@ -119,13 +119,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
-    @Override
-    public void update(EmployeeDTO employeeDTO) {
-        Employee employee = new Employee();
-        BeanUtils.copyProperties(employeeDTO,employee);
-       // employee.setUpdateTime(LocalDateTime.now());
-       // employee.setUpdateUser(BaseContext.getCurrentId());
-        employeeMapper.update(employee);
-    }
 
 }

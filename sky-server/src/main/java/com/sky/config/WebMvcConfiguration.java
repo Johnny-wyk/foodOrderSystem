@@ -71,12 +71,15 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
-    /*
-    苦战springmvc框架的消息转化器
+    /**
+     * 扩展Spring MVC框架的消息转化器
+     * @param conveters
      */
     protected void extendMessageConverters(List<HttpMessageConverter<?>> conveters){
         log.info("扩展消息转化器");
+        //创建一个消息转化器对象
         MappingJackson2HttpMessageConverter converter=new MappingJackson2HttpMessageConverter();
+        //需要为消息转化器设置一个对象转化器
         converter.setObjectMapper(new JacksonObjectMapper());
         conveters.add(0,converter);
     }

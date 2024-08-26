@@ -26,6 +26,12 @@ public class GlobalExceptionHandler {
         log.error("异常信息：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
+
+    /**
+     * 处理sql异常
+     * @param ex
+     * @return
+     */
     @ExceptionHandler
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex){
         String message=ex.getMessage();

@@ -17,6 +17,9 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * 自定义切面，实现公共字段自动填充处理逻辑
+ */
 @Aspect
 @Slf4j
 @Component
@@ -34,9 +37,9 @@ public class AutoFillAspect {
     public void autoFill(JoinPoint joinPoint){
         log.info("开始进行公共字段自动填充");
         //获取当前被拦截方法上的数据库操作类型
-            MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        AutoFill annotation = signature.getMethod().getAnnotation(AutoFill.class);
-        OperationType operationType = annotation.value();
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();//方法签名对象
+        AutoFill annotation = signature.getMethod().getAnnotation(AutoFill.class);//获得方法上的注解对象
+        OperationType operationType = annotation.value();//获得数据库操作类型
 
         //获取被拦截方法的参数--实体对象
         Object[] args = joinPoint.getArgs();
@@ -54,7 +57,7 @@ public class AutoFillAspect {
                 Method setCreateUssr=eneity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_USER,Long.class);
                 Method setUpdateTime=eneity.getClass().getDeclaredMethod("setUpdateTime", LocalDate.class);
                 Method setUpdateUser=eneity.getClass().getDeclaredMethod("setUpdateUser",Long.class);
-
+                //通过反射为对象属性赋值
                 setCreateTime.invoke(eneity,now);
                 setCreateUssr.invoke(eneity,currentId);
                 setUpdateTime.invoke(eneity,now);

@@ -22,5 +22,30 @@
         </if>
         </where>
         order by dish.create_time desc
-</select>
+    </select>
+    
+    <update id="update">
+        update dish
+        <set>
+            <if test="name != null">name = #{name}</if>
+            <if test="categoryId != null">category_id = #{categoryId}</if>
+            <if test="price != null">price = #{price}</if>
+            <if test="image != null">image = #{image}</if>
+            <if test="description != null">description = #{description}</if>
+            <if test="status != null">status = #{status}</if>
+            <if test="updateTime != null">updateTime = #{updateTime}</if>
+            <if test="updateUser != null">updateUser = #{updateUser}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getByCategoryId" resultType="Dish" parameterType="Dish">
+        select * from dish
+        <where>
+            <if test="name != null">and name like concat ('%',#{name},'%')</if>
+            <if test="categoryId != null">category_Id = #{categoryId}</if>
+            <if test="status != null">status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
 </mapper>

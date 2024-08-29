@@ -13,7 +13,7 @@
     </select>
 
     <update id="update">
-        update Employee
+        update employee
         <set>
             <if test="name != null">name=#{name}</if>
             <if test="username != null">username=#{username}</if>
